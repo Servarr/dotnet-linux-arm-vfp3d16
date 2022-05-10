@@ -1,0 +1,65 @@
+From 04c963624e90c2a46d3caaf65068c8e6573479ef Mon Sep 17 00:00:00 2001
+From: ta264 <ta264@users.noreply.github.com>
+Date: Mon, 9 May 2022 17:12:12 +0100
+Subject: [PATCH] Build for vfp3-d16 CPUs
+
+---
+ Directory.Build.props                                         | 3 +--
+ eng/native/init-distro-rid.sh                                 | 2 +-
+ .../Microsoft.NETCore.Platforms/src/runtimeGroups.props       | 4 ++--
+ 3 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/Directory.Build.props b/Directory.Build.props
+index 54ae373485c..6c7d273110c 100644
+--- a/Directory.Build.props
++++ b/Directory.Build.props
+@@ -171,14 +171,13 @@
+     <MicrosoftNetCoreIlasmPackageRuntimeId Condition="'$(PortableBuild)' != 'true' and '$(_portableOS)' == 'linux'">linux-$(_hostArch)</MicrosoftNetCoreIlasmPackageRuntimeId>
+     <MicrosoftNetCoreIlasmPackageRuntimeId Condition="'$(MicrosoftNetCoreIlasmPackageRuntimeId)' == ''">$(_toolRuntimeRID)</MicrosoftNetCoreIlasmPackageRuntimeId>
+ 
+-    <PackageRID>$(_packageOS)-$(TargetArchitecture)</PackageRID>
++    <PackageRID>linux-arm-vfpv3d16</PackageRID>
+ 
+     <!-- Crossgen2 does not support armel, so we will use arm instead. -->
+     <Crossgen2PackageRID Condition="'$(TargetArchitecture)' == 'armel'">$(_packageOS)-arm</Crossgen2PackageRID>
+     <Crossgen2PackageRID Condition="'$(TargetArchitecture)' != 'armel'">$(PackageRID)</Crossgen2PackageRID>
+ 
+     <OutputRid Condition="'$(OutputRid)' == ''">$(PackageRID)</OutputRid>
+-    <OutputRid Condition="'$(PortableBuild)' == 'true'">$(_portableOS)-$(TargetArchitecture)</OutputRid>
+   </PropertyGroup>
+ 
+   <PropertyGroup Label="CalculateTargetOSName" Condition="'$(SkipInferTargetOSName)' != 'true'">
+diff --git a/eng/native/init-distro-rid.sh b/eng/native/init-distro-rid.sh
+index f71aa8640b1..d1a09279f9d 100644
+--- a/eng/native/init-distro-rid.sh
++++ b/eng/native/init-distro-rid.sh
+@@ -167,7 +167,7 @@ initDistroRidGlobal()
+ 
+         if [ -z "${distroRid}" ]; then
+             if [ "$targetOs" = "Linux" ]; then
+-                distroRid="linux-$buildArch"
++                distroRid="linux-arm-vfpv3d16"
+             elif [ "$targetOs" = "OSX" ]; then
+                 distroRid="osx-$buildArch"
+             elif [ "$targetOs" = "MacCatalyst" ]; then
+diff --git a/src/libraries/Microsoft.NETCore.Platforms/src/runtimeGroups.props b/src/libraries/Microsoft.NETCore.Platforms/src/runtimeGroups.props
+index 200baf29070..ee9ace45ab7 100644
+--- a/src/libraries/Microsoft.NETCore.Platforms/src/runtimeGroups.props
++++ b/src/libraries/Microsoft.NETCore.Platforms/src/runtimeGroups.props
+@@ -2,11 +2,11 @@
+   <ItemGroup>
+     <RuntimeGroup Include="unix">
+       <Parent>any</Parent>
+-      <Architectures>x64;x86;arm;armel;arm64;mips64;s390x</Architectures>
++      <Architectures>x64;x86;arm;arm-vfpv3d16;armel;arm64;mips64;s390x</Architectures>
+     </RuntimeGroup>
+     <RuntimeGroup Include="linux">
+       <Parent>unix</Parent>
+-      <Architectures>x64;x86;arm;armel;arm64;mips64;s390x</Architectures>
++      <Architectures>x64;x86;arm;arm-vfpv3d16;armel;arm64;mips64;s390x</Architectures>
+     </RuntimeGroup>
+     <RuntimeGroup Include="linux-musl">
+       <Parent>linux</Parent>
+-- 
+2.25.1
+
